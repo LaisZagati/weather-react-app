@@ -25,7 +25,7 @@
   list-style: none;
 }
 
-.Weather img {
+.Weather .canvas {
   height: 64px;
   width: 64px;
   margin-right: 10px;
@@ -37,9 +37,10 @@
 .Weather .temperature {
   font-weight: bold;
   color: rgb(33, 33, 33);
-  font-size: 64px;
+  font-size: 75px;
   line-height: 64px;
   font-weight: 400;
+  margin: 10px;
 }
 
 .Weather .unit {
