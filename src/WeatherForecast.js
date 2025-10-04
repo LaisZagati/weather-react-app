@@ -8,7 +8,10 @@ export default function WeatherForecast(props) {
   let [forecast, setForecast] = useState(null);
 
   function handleResponse(response) {
-    setForecast(response.data.list);
+    let dailyForecast = response.data.list.filter((forecastItem) =>
+      forecastItem.dt_txt.includes("12:00:00")
+    );
+    setForecast(dailyForecast);
     setLoaded(true);
   }
 
@@ -26,14 +29,18 @@ export default function WeatherForecast(props) {
   if (loaded && forecast && forecast.length > 0) {
     console.log(forecast);
 
-    let today = forecast[0];
-
     return (
       <div className="WeatherForecast">
         <div className="row">
-          <div className="col">
-            <WeatherForecastDay data={forecast[0]} />
-          </div>
+          {forecast.map(function (dailyForecast, index) {
+            if (index < 6) {
+              return (
+                <div className="col" key={index}>
+                  <WeatherForecastDay data={dailyForecast} />
+                </div>
+              );
+            }
+          })}
         </div>
       </div>
     );
