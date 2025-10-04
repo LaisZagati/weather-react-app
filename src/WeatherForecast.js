@@ -1,32 +1,43 @@
-import React from "react";
-import WeatherIcon from "./WeatherIcon";
+import React, { useState, useEffect } from "react";
 import "./WeatherForecast.css";
 import axios from "axios";
+import WeatherForecastDay from "./WeatherForecastDay";
 
 export default function WeatherForecast(props) {
+  let [loaded, setLoaded] = useState(false);
+  let [forecast, setForecast] = useState(null);
+
   function handleResponse(response) {
-    console.log(response.data);
+    setForecast(response.data.list);
+    setLoaded(true);
   }
 
-  let apiKey = "ab8e7ef210556986d1c9a75d6007b825";
-  let longitude = props.coordinates.lon;
-  let latitude = props.coordinates.lat;
-  let apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+  useEffect(() => {
+    if (!props.coordinates) return;
 
-  axios.get(apiUrl).then(handleResponse);
+    let apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
+    let longitude = props.coordinates.lon;
+    let latitude = props.coordinates.lat;
+    let apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
 
-  return (
-    <div className="WeatherForecast">
-      <div className="row">
-        <div className="col">
-          <div className="WeatherForecast-day">Mon</div>
-          <WeatherIcon code="01d" size={36} />
-          <div className="WeatherForecast-temperature">
-            <span className="WeatherForecast-temperature-max">19°</span>
-            <span className="WeatherForecast-temperature-min">10°</span>
+    axios.get(apiUrl).then(handleResponse);
+  }, [props.coordinates]);
+
+  if (loaded && forecast && forecast.length > 0) {
+    console.log(forecast);
+
+    let today = forecast[0];
+
+    return (
+      <div className="WeatherForecast">
+        <div className="row">
+          <div className="col">
+            <WeatherForecastDay data={forecast[0]} />
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    return null;
+  }
 }
