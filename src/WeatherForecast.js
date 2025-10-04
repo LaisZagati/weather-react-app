@@ -8,6 +8,7 @@ export default function WeatherForecast(props) {
   let [forecast, setForecast] = useState(null);
 
   function handleResponse(response) {
+    // filter only the daily forecasts at 12:00
     let dailyForecast = response.data.list.filter((forecastItem) =>
       forecastItem.dt_txt.includes("12:00:00")
     );
@@ -32,15 +33,11 @@ export default function WeatherForecast(props) {
     return (
       <div className="WeatherForecast">
         <div className="row">
-          {forecast.map(function (dailyForecast, index) {
-            if (index < 6) {
-              return (
-                <div className="col" key={index}>
-                  <WeatherForecastDay data={dailyForecast} />
-                </div>
-              );
-            }
-          })}
+          {forecast.slice(0, 6).map((dailyForecast, index) => (
+            <div className="col" key={index}>
+              <WeatherForecastDay data={dailyForecast} />
+            </div>
+          ))}
         </div>
       </div>
     );
