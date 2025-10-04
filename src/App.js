@@ -6,7 +6,8 @@ function App() {
   return (
     <div className="App">
       <div className="container">
-        <Weather defaultCity="New York" />
+        <h1 class="page-title">Weather Forecast</h1>
+        <Weather defaultCity="Miami" />
         <footer>
           {" "}
           This project was coded by Lais Zagati and is
