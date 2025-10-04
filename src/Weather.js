@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import WeatherInfo from "./WeatherInfo";
 import WeatherForecast from "./WeatherForecast";
 import "./Weather.css";
@@ -6,7 +6,8 @@ import axios from "axios";
 
 export default function Weather(props) {
   const [weatherData, setWeatherData] = useState({ ready: false });
-  const [city, setCity] = useState(props.defaultCity);
+  const [city, setCity] = useState(""); // input starts empty
+
   function handleResponse(response) {
     setWeatherData({
       ready: true,
@@ -19,22 +20,32 @@ export default function Weather(props) {
       wind: response.data.wind.speed,
       city: response.data.name,
     });
+    setCity(""); // clear input after search
   }
 
-  function search() {
+  function search(cityToSearch) {
     const apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
-    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityToSearch}&appid=${apiKey}&units=metric`;
     axios.get(apiUrl).then(handleResponse);
   }
 
   function handleSubmit(event) {
     event.preventDefault();
-    search();
+    if (city) {
+      search(city);
+    }
   }
 
   function handleCityChange(event) {
     setCity(event.target.value);
   }
+
+  // On first load, search the default city
+  useEffect(() => {
+    if (!weatherData.ready) {
+      search(props.defaultCity);
+    }
+  }, [props.defaultCity, weatherData.ready]);
 
   if (weatherData.ready) {
     return (
@@ -46,7 +57,8 @@ export default function Weather(props) {
                 type="search"
                 placeholder="Enter a city.."
                 className="form-control"
-                autoFocus="on"
+                autoFocus
+                value={city} // controlled input
                 onChange={handleCityChange}
               />
             </div>
@@ -64,7 +76,6 @@ export default function Weather(props) {
       </div>
     );
   } else {
-    search();
     return "Loading...";
   }
 }
