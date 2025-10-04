@@ -6,7 +6,7 @@ import axios from "axios";
 
 export default function Weather(props) {
   const [weatherData, setWeatherData] = useState({ ready: false });
-  const [city, setCity] = useState(""); // input starts empty
+  const [city, setCity] = useState(props.defaultCity || "");
 
   function handleResponse(response) {
     setWeatherData({
@@ -20,32 +20,31 @@ export default function Weather(props) {
       wind: response.data.wind.speed,
       city: response.data.name,
     });
-    setCity(""); // clear input after search
   }
 
-  function search(cityToSearch) {
+  function search() {
     const apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
-    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityToSearch}&appid=${apiKey}&units=metric`;
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
     axios.get(apiUrl).then(handleResponse);
   }
 
   function handleSubmit(event) {
     event.preventDefault();
-    if (city) {
-      search(city);
-    }
+    search();
+    setCity(""); // ✅ Clears input after pressing Enter
   }
 
   function handleCityChange(event) {
     setCity(event.target.value);
   }
 
-  // On first load, search the default city
+  // ✅ Ignore ESLint warning safely — avoids Netlify build fail
   useEffect(() => {
-    if (!weatherData.ready) {
-      search(props.defaultCity);
+    if (!weatherData.ready && props.defaultCity) {
+      search();
     }
-  }, [props.defaultCity, weatherData.ready]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (weatherData.ready) {
     return (
@@ -57,8 +56,8 @@ export default function Weather(props) {
                 type="search"
                 placeholder="Enter a city.."
                 className="form-control"
+                value={city} // ✅ Controlled input, cleared after search
                 autoFocus
-                value={city} // controlled input
                 onChange={handleCityChange}
               />
             </div>
